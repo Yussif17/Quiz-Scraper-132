@@ -7,39 +7,38 @@ import tkinter as tk
 import threading
 from creds import MAIN_URL, QUIZ_URL, REFRESH_INTERVAL, WAIT_FOR_LOGIN_TIME
 
+import tkinter as tk
+
 def notify_user():
-    def show_popup():
-        root = tk.Tk()
-        root.title("QUIZ OPEN!")
-        root.configure(bg='black')
+    root = tk.Tk()
+    root.title("QUIZ OPEN!")
+    root.configure(bg='black')
 
-        # Ensure the window pops on top and fullscreen
-        root.lift()
-        root.attributes("-topmost", True)
-        root.attributes('-fullscreen', True)
+    # Bring window to front
+    root.lift()
+    root.attributes("-topmost", True)
+    root.attributes('-fullscreen', True)
 
-        label = tk.Label(
-            root,
-            text="QUIZ IS NOW OPEN!",
-            font=("Arial", 80),
-            fg="red",
-            bg="black"
-        )
-        label.pack(expand=True)
+    label = tk.Label(
+        root,
+        text="QUIZ IS NOW OPEN!",
+        font=("Arial", 80),
+        fg="red",
+        bg="black"
+    )
+    label.pack(expand=True)
 
-        # Close on Escape or mouse click
-        root.bind("<Escape>", lambda e: root.destroy())
-        root.bind("<Button-1>", lambda e: root.destroy())
+    # Close on Escape or click
+    root.bind("<Escape>", lambda e: root.destroy())
+    root.bind("<Button-1>", lambda e: root.destroy())
 
-        root.mainloop()
-
-    threading.Thread(target=show_popup).start()
+    root.mainloop()
 
 def monitor_quiz(driver):
     driver.get(QUIZ_URL)
     while True:
         try:
-            take_quiz_btn = driver.find_element(By.XPATH, "//button[contains(text(), 'Take the Quiz')]")
+            take_quiz_btn = driver.find_element(By.XPATH, "//a[text()='Take the Quiz']")
             print("[+] Quiz is now OPEN!")
             notify_user()
             break
