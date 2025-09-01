@@ -5,18 +5,34 @@ from selenium.common.exceptions import NoSuchElementException
 import time
 import tkinter as tk
 import threading
-from creds import QUIZ_URL, REFRESH_INTERVAL, WAIT_FOR_LOGIN_TIME
+from creds import MAIN_URL, QUIZ_URL, REFRESH_INTERVAL, WAIT_FOR_LOGIN_TIME
 
 def notify_user():
     def show_popup():
         root = tk.Tk()
         root.title("QUIZ OPEN!")
-        root.attributes('-fullscreen', True)
-        label = tk.Label(root, text="QUIZ IS NOW OPEN!", font=("Arial", 80), fg="red")
-        label.pack(expand=True)
         root.configure(bg='black')
+
+        # Ensure the window pops on top and fullscreen
+        root.lift()
+        root.attributes("-topmost", True)
+        root.attributes('-fullscreen', True)
+
+        label = tk.Label(
+            root,
+            text="QUIZ IS NOW OPEN!",
+            font=("Arial", 80),
+            fg="red",
+            bg="black"
+        )
+        label.pack(expand=True)
+
+        # Close on Escape or mouse click
+        root.bind("<Escape>", lambda e: root.destroy())
+        root.bind("<Button-1>", lambda e: root.destroy())
+
         root.mainloop()
-    
+
     threading.Thread(target=show_popup).start()
 
 def monitor_quiz(driver):
@@ -40,17 +56,20 @@ def main():
 
     try:
         # Step 1: Go to Canvas login page
-        driver.get("https://wustl.instructure.com")
+        driver.get(MAIN_URL)
         print(f"[*] Please log in manually using your WUSTL Key. You have {WAIT_FOR_LOGIN_TIME} seconds.")
         time.sleep(WAIT_FOR_LOGIN_TIME)
 
         # Step 2: Start monitoring the quiz
         monitor_quiz(driver)
 
+        # Keep browser open for the quiz to be taken
+        print("[*] Quiz is open. Waiting here so browser stays up.")
+        while True:
+            time.sleep(60)
+
     except Exception as e:
         print("[!] Error:", e)
-    finally:
-        print("[*] Done.")
 
 if __name__ == "__main__":
     main()
